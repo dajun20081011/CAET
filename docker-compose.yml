@@ -1,0 +1,87 @@
+# ============================================================
+# CAET 统一训练平台 — Docker 编排
+# 四服务：caet-frontend(nginx) / caet-backend(fastapi) /
+#         caet-postgres / caet-redis
+# 全部在独立 bridge 网络 caet_net，与 Cabin Voice 物理隔离。
+# 仅 caet-frontend 对宿主机暴露 CAET_HTTP_PORT（默认 8080，
+# 避免与 Cabin Voice 的 80/443 冲突）。
+# 启动：cp .env.example .env && docker compose up -d
+# ============================================================
+name: caet
+
+services:
+  caet-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: caet
+      POSTGRES_USER: caet_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes:
+      - caet_pgdata:/var/lib/postgresql/data
+    networks:
+      - caet_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caet_user -d caet"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  caet-redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - caet_redis:/data
+    networks:
+      - caet_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  caet-backend:
+    build: ./caet-backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://caet_user:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@caet-postgres:5432/caet
+      REDIS_URL: redis://caet-redis:6379/0
+    depends_on:
+      caet-postgres:
+        condition: service_healthy
+      caet-redis:
+        condition: service_healthy
+    volumes:
+      - caet_uploads:/app/uploads
+    networks:
+      - caet_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  caet-frontend:
+    build: .
+    depends_on:
+      caet-backend:
+        condition: service_healthy
+    ports:
+      - "${CAET_HTTP_PORT:-80}:80"
+      - "${CAET_HTTPS_PORT:-443}:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - caet_net
+    restart: unless-stopped
+
+volumes:
+  caet_pgdata:
+  caet_redis:
+  caet_uploads:
+
+networks:
+  caet_net:
+    driver: bridge

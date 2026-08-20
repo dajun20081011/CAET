@@ -1,0 +1,19 @@
+# 前端镜像构建上下文（根目录）忽略项
+node_modules
+dist
+deploy-dist
+prod-dist
+__pycache__
+*.pyc
+.git
+.env
+.env.*
+!.env.example
+caet-backend
+*.log
+.vscode
+.idea
+.DS_Store
+CAET_*_Deploy*.zip
+_pkg_caet
+_staging_*

@@ -1,0 +1,46 @@
+# ===================== CAET .gitignore =====================
+# 依赖
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# 构建产物
+deploy-dist/
+prod-dist/
+build/
+
+# 环境变量 / 密钥（绝不入库）
+.env
+.env.*
+!.env.example
+caet-backend/.env
+
+# 上传文件
+uploads/
+caet-backend/uploads/
+
+# 日志
+*.log
+logs/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 旧部署残留（历史，不入库）
+CAET_V1_Production_Deploy/
+CAET_V1_Production_Deploy.zip
+CAET_Production_Deploy.zip
+CAET_Production_Deploy_v1.0.zip
+_pkg_caet/
+_staging_CAET_V1/
+*.timestamp-*.mjs
+
+# Python
+.pytest_cache/
+.mypy_cache/

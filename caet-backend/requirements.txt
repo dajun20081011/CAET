@@ -1,0 +1,16 @@
+# CAET 后端依赖（FastAPI + PostgreSQL）
+# 注意：与 Cabin Voice 的 Python 环境隔离，使用独立虚拟环境（见 DEPLOYMENT.md）
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+sqlalchemy==2.0.35
+# 注：原方案为 asyncpg==0.29.0；因本地验证环境为 Python 3.13 且无 MSVC 编译环境，
+# 0.29.0 在该平台无预编译 wheel，故升级到 0.31.0（技术栈 asyncpg 不变，仅补丁版本）。
+asyncpg==0.31.0
+pydantic==2.9.0
+pydantic-settings==2.5.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart==0.0.12
+# Redis 轻量接入（会话/简单缓存/AI 预留）
+redis==5.0.8
