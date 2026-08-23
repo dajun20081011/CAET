@@ -1,0 +1,83 @@
+name: 正式发布
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    name: 构建并发布部署包
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出源码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建前端
+        run: npm run build
+
+      - name: 组装部署目录
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_name="CAET-${GITHUB_REF_NAME}"
+          package_dir="release/${package_name}"
+          mkdir -p "${package_dir}"
+          cp -R dist "${package_dir}/dist"
+          cp -R caet-backend "${package_dir}/caet-backend"
+          rm -rf "${package_dir}/caet-backend/__pycache__" \
+                 "${package_dir}/caet-backend/.pytest_cache" \
+                 "${package_dir}/caet-backend/uploads"
+          cp Dockerfile docker-compose.yml nginx.caet.conf .env.example README.md "${package_dir}/"
+          cat > "${package_dir}/发布说明.md" <<EOF
+          # CAET ${GITHUB_REF_NAME} 部署包
+
+          - 版本：${GITHUB_REF_NAME}
+          - 提交：${GITHUB_SHA}
+          - 构建：GitHub Actions #${GITHUB_RUN_NUMBER}
+          - 前端产物：dist/
+          - 后端源码：caet-backend/
+          EOF
+          (
+            cd release
+            zip -qr "${package_name}.zip" "${package_name}"
+            sha256sum "${package_name}.zip" > "${package_name}.zip.sha256"
+          )
+
+      - name: 保存工作流构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: CAET-${{ github.ref_name }}
+          path: |
+            release/CAET-${{ github.ref_name }}.zip
+            release/CAET-${{ github.ref_name }}.zip.sha256
+          if-no-files-found: error
+
+      - name: 创建 GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "release/CAET-${GITHUB_REF_NAME}.zip" \
+            "release/CAET-${GITHUB_REF_NAME}.zip.sha256" \
+            --title "CAET ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --verify-tag
