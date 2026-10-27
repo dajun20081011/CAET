@@ -1,0 +1,26 @@
+services:
+  pronunciation-engine:
+    build:
+      context: .
+    image: cabinlingo/pronunciation-engine:0.2.1
+    container_name: cabinlingo-pronunciation-engine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      MODEL_PRELOAD: "true"
+      ONNX_INTRA_THREADS: "2"
+      MAX_CONCURRENT_ASSESSMENTS: "1"
+      MAX_AUDIO_SECONDS: "5"
+      CORS_ORIGINS: "https://crew.cabinvoice.cn"
+    cpus: 2.0
+    mem_limit: 2g
+    networks:
+      - default
+      - cabinlingo
+
+networks:
+  cabinlingo:
+    external: true
+    name: cabinlingo_cabinlingo
+

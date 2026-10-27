@@ -1,0 +1,17 @@
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.dump
+*.db
+*.bak*
+*.backup*
+*.before*
+__pycache__/
+node_modules/
+uploads/
+backups/
+models/
+data/

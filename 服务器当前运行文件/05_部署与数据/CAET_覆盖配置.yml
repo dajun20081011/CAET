@@ -1,0 +1,13 @@
+services:
+  api:
+    image: cabinlingo-api:cabinlingo-production-v1-20260821_173419
+    build:
+      context: /opt/caet/releases/cabinlingo-production-v1-20260821_173419/source/backend-package/backend
+      dockerfile: Dockerfile
+    env_file:
+      - /opt/caet/config/cabinlingo.env
+    environment:
+      CAET_JWT_SECRET: ${CAET_JWT_SECRET}
+      UPLOAD_DIR: /uploads
+      APP_ENV: production
+      ENABLE_DEMO_SEED: "false"
