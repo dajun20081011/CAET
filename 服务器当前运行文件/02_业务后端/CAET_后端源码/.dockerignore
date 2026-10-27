@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+imports/work/
+test_*.py

@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="36" height="8" viewBox="0 0 36 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="AI Loading Dots" clip-path="url(#clip0_0_9)">
+<rect width="36" height="8" fill="white"/>
+<circle id="Dot 1" cx="4" cy="4" r="4" fill="#1769F0" fill-opacity="0.45"/>
+<circle id="Dot 2" cx="18" cy="4" r="4" fill="#1769F0"/>
+<circle id="Dot 3" cx="32" cy="4" r="4" fill="#1769F0" fill-opacity="0.45"/>
+</g>
+<defs>
+<clipPath id="clip0_0_9">
+<rect width="36" height="8" fill="white"/>
+</clipPath>
+</defs>
+</svg>

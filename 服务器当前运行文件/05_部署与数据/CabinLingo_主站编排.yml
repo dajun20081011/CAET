@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?required}
+      POSTGRES_USER: ${POSTGRES_USER:?required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - cabinlingo_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [cabinlingo]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server","--appendonly","yes"]
+    volumes:
+      - cabinlingo_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [cabinlingo]
+
+  api:
+    build:
+      context: ./backend-package/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      APP_ENV: production
+      ENABLE_DEMO_SEED: "false"
+      DATABASE_URL: ${DATABASE_URL:?required}
+      JWT_SECRET: ${JWT_SECRET:?required}
+      JWT_ISSUER: ${JWT_ISSUER:-cabinlingo-api}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-cabinlingo-web}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?required}
+      UPLOAD_DIR: /uploads
+      AUDIO_MAX_BYTES: ${AUDIO_MAX_BYTES:-26214400}
+      COURSE_MEDIA_MAX_BYTES: ${COURSE_MEDIA_MAX_BYTES:-104857600}
+      TENCENT_COS_FALLBACK_VIDEO_KEYS: "expression-skills/videos/第1期实用篇（英语）.mp4"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    expose: ["8000"]
+    volumes:
+      - cabinlingo_uploads:/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/core/health',timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [cabinlingo]
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api: { condition: service_healthy }
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ${TLS_CERT_PATH:?required}:/etc/nginx/ssl/fullchain.crt:ro
+      - ${TLS_KEY_PATH:?required}:/etc/nginx/ssl/private.key:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [cabinlingo]
+
+volumes:
+  cabinlingo_postgres:
+  cabinlingo_redis:
+  cabinlingo_uploads:
+
+networks:
+  cabinlingo:

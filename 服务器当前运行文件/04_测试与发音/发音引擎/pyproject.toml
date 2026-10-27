@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cabinlingo-pronunciation-engine"
+version = "0.2.1"
+description = "Lightweight phoneme-level pronunciation training service for CabinLingo"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "fastapi==0.143.1",
+  "numpy==2.4.6",
+  "onnxruntime==1.23.2",
+  "python-multipart==0.0.32",
+  "uvicorn[standard]==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx==0.28.1",
+  "pytest==9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

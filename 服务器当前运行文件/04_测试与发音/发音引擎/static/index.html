@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CabinLingo · 发音专项训练</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <span class="eyebrow">CABINLINGO · POC</span>
+        <h1>发音专项训练</h1>
+        <p>选择易错词，听示范，然后录下你的发音。</p>
+      </header>
+
+      <section class="card practice-card">
+        <label for="wordSelect">训练单词</label>
+        <select id="wordSelect" aria-label="选择训练单词"></select>
+        <div class="word-display">
+          <div>
+            <h2 id="wordText">three</h2>
+            <p><span id="wordIpa">/θriː/</span> · <span id="wordMeaning">三</span></p>
+          </div>
+          <button id="listenButton" class="secondary" type="button">▶ 听示范</button>
+        </div>
+        <div class="focus" id="focusText">重点音 /θ/</div>
+
+        <button id="recordButton" class="record" type="button">
+          <span class="record-dot"></span>
+          <span id="recordLabel">开始录音</span>
+        </button>
+        <p class="hint" id="statusText">建议录制 1–3 秒，保持环境安静。</p>
+      </section>
+
+      <section class="card result-card hidden" id="resultCard" aria-live="polite">
+        <div class="score-row">
+          <div>
+            <span class="eyebrow">本次结果</span>
+            <h2 id="resultTitle">继续练习</h2>
+          </div>
+          <div class="score" id="scoreValue">—</div>
+        </div>
+        <div class="phones">
+          <div><span>标准</span><strong id="expectedPhones"></strong></div>
+          <div><span>听到</span><strong id="heardPhones"></strong></div>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <p class="metrics" id="metrics"></p>
+      </section>
+    </main>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
+

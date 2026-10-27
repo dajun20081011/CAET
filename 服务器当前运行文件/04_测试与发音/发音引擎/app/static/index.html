@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CabinLingo 发音引擎 POC</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">CABINLINGO · PRONUNCIATION LAB</p>
+      <h1>航空英语音素训练</h1>
+      <p class="subtitle">选择一个词，录音后查看每个音素的诊断结果。</p>
+    </header>
+
+    <section class="panel controls">
+      <label for="word">练习词</label>
+      <select id="word"></select>
+      <div id="wordMeta" class="word-meta"></div>
+      <label for="apiKey">API Key（如服务器已配置）</label>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="可留空">
+      <div class="actions">
+        <button id="record" class="primary">开始录音</button>
+        <button id="stop" disabled>停止</button>
+        <label class="file-button">上传音频<input id="file" type="file" accept="audio/*,.wav,.flac"></label>
+      </div>
+      <p id="status" class="status">正在读取词库…</p>
+      <audio id="preview" controls hidden></audio>
+      <button id="submit" class="submit" disabled>分析发音</button>
+    </section>
+
+    <section id="result" class="panel result" hidden>
+      <div class="score-row">
+        <div><span id="score" class="score">—</span><small>/ 100</small></div>
+        <div><p>反馈音素</p><strong id="errorCount">—</strong></div>
+        <div><p>处理耗时</p><strong id="latency">—</strong></div>
+      </div>
+      <div id="phones" class="phones"></div>
+      <details>
+        <summary>查看原始结果</summary>
+        <pre id="raw"></pre>
+      </details>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

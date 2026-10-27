@@ -1,0 +1,7 @@
+services:
+  nginx:
+    build:
+      context: /opt/cabinlingo-course-test/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:28080:80"

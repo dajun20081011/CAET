@@ -1,0 +1,7 @@
+{
+  "release": "cabinlingo-prosody-direct-download-20261005",
+  "login_stability_patch": "login-stability-20260908-r2",
+  "required_schema": "0018",
+  "admin_entry": "/#/admin/dashboard",
+  "course_entry": "/#/admin/courses"
+}
